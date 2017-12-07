@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -24,7 +25,11 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 		view.setSuffix(".jsp");
 		return view;
 	}
-	
+
+	@Bean
+	public StandardPasswordEncoder passwordEncoder() {
+		return new StandardPasswordEncoder();
+	}
 
 	@Override
 	public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {

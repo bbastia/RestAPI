@@ -21,6 +21,9 @@
 			<h1>Welcome to Rest API</h1>
 			<div>
 				<h3>click on below bottom</h3>
+				<div class="alert alert-info">
+				<p>Use password as password@123</p>
+				</div>
 				<div >
 					<a href="<c:url value="/user/list"/>" class="btn btn-info" role="button">Link Button</a>
 					</div>
