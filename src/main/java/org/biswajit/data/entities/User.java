@@ -7,6 +7,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name="ep_user")
@@ -20,6 +21,7 @@ public class User {
 	@Column(name="firstName")
 	private String firstName;
 	
+	@NotNull(message="can't be null ")
 	@Column(name="lastName")
 	private String lastName;
 	

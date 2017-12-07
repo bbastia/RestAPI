@@ -3,18 +3,23 @@ package org.biswajit.controller;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 
 import org.biswajit.data.entities.User;
 import org.biswajit.data.entities.UserDto;
 import org.biswajit.service.UserService;
+import org.biswajit.validator.RestValidator;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.validation.Errors;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -31,6 +36,9 @@ public class UserController {
 
 	@Autowired
 	private UserService userService;
+	
+	@Autowired
+	private RestValidator userValidator;
 	
 	
 	@RequestMapping(value="/list",method=RequestMethod.GET ,
@@ -58,11 +66,19 @@ public class UserController {
 	}
 	
 	@PostMapping(value="/add" ,produces={MediaType.APPLICATION_JSON_VALUE,MediaType.APPLICATION_XML_VALUE})
-	@ResponseStatus(value=HttpStatus.CREATED)
-	public @ResponseBody User add(@RequestBody User user){
+	public @ResponseBody User add(@Valid @RequestBody User user ,Errors errors  ,HttpServletResponse response){
 		System.out.println(user);
-		userService.saveOrUpdateUser(user);
-		return user;
+		if(errors.hasErrors()){
+			System.out.println("there is error");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			return new User();
+		}else{
+			userService.saveOrUpdateUser(user);
+			response.setStatus(HttpServletResponse.SC_CREATED);
+			return user;
+		}
+		
+	
 	}
 	
 	@PutMapping(value="/update/{userId}",consumes=MediaType.APPLICATION_JSON_VALUE,
@@ -82,6 +98,11 @@ public class UserController {
 		return user;
 	}
 	
+	
+	  @InitBinder
+	    private void initBinder(WebDataBinder binder) {
+	        binder.setValidator(userValidator);
+	    }
 	
 	
 }
