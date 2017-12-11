@@ -16,22 +16,32 @@
 	src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.0/angular.min.js"></script>
 </head>
 <body>
+<nav class="brand-logo navbar ">
+
 	<div class="fluid-container">
+		<div class="container alert alert-success">
+			<h2>Welcome to Rest API</h2>
+			</div>
+			</div>
+			</nav>
+		<div class="fluid-container">
 		<div class="container">
-			<h1>Welcome to Rest API</h1>
 			<div>
-				<h3>click on below bottom</h3>
-				<div class="alert alert-info">
+		
+				<!-- <div class="alert alert-info">
 				<p>Use password as password@123</p>
-				</div>
+				</div> -->
 				<div >
-					<a href="<c:url value="/user/list"/>" class="btn btn-info" role="button">Link Button</a>
-					</div>
+					<a href="<c:url value="/user/list"/>" class="btn btn-info" role="button">Rest Api</a>
+					<a href="<c:url value="/swagger-ui.html"/>" class="btn btn-info" role="button">Swagger Api Documents</a>
+				</div>
 					<div>
+					<br/>
 						<p>Add .xml or .json for extension in the end of url</p>
 					</div>
 				</div>
 			</div>
 			</div>
+
 </body>
 </html>

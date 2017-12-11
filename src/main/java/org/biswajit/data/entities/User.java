@@ -25,9 +25,20 @@ public class User {
 	@Column(name="lastName")
 	private String lastName;
 	
+	
 	@Embedded
 	private Address address;
 
+	
+	public User(){
+		
+	}
+	
+	public User(String firstName,String lastName){
+		this.firstName=firstName;
+		this.lastName=lastName;
+	}
+	
 	public int getUserId() {
 		return userId;
 	}

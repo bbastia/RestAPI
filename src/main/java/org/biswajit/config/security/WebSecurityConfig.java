@@ -13,6 +13,13 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
+import org.springframework.security.oauth2.provider.ClientDetailsService;
+import org.springframework.security.oauth2.provider.approval.ApprovalStore;
+import org.springframework.security.oauth2.provider.approval.TokenApprovalStore;
+import org.springframework.security.oauth2.provider.approval.TokenStoreUserApprovalHandler;
+import org.springframework.security.oauth2.provider.request.DefaultOAuth2RequestFactory;
+import org.springframework.security.oauth2.provider.token.TokenStore;
+import org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore;
 
 import com.mysql.cj.api.authentication.AuthenticationProvider;
 
@@ -20,40 +27,53 @@ import com.mysql.cj.api.authentication.AuthenticationProvider;
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private static String REALM="MY_TEST_REALM";
-    
-    @Autowired
-    private StandardPasswordEncoder encoder;
-    
-    @Autowired
-    public void configureGlobalSecurity(AuthenticationManagerBuilder auth) throws Exception {
-        auth.inMemoryAuthentication().passwordEncoder(encoder)
-        .withUser("bbastia").password("d6db26a4d6971acd85148751fe3805c8a1d384b53f3dfe891a5d1e4a921e84faff721be61dd48c89")
-        .roles("USER");
-        
-        
-    }
-    
-
-
-	@Override
-    protected void configure(HttpSecurity http) throws Exception {
-  
-      http.csrf().disable()
-        .authorizeRequests()
-        .antMatchers("/user/**").hasRole("USER")
-        .and().httpBasic().realmName(REALM).authenticationEntryPoint(getBasicAuthEntryPoint())
-        .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);//We don't need sessions to be created.
-    }
-     
-    @Bean
-    public CustomBasicAuthenticationEntryPoint getBasicAuthEntryPoint(){
-        return new CustomBasicAuthenticationEntryPoint();
-    }
-     
-    /* To allow Pre-flight [OPTIONS] request from browser */
-    @Override
-    public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers(HttpMethod.OPTIONS, "/**");
-    }
+	 @Autowired
+	    private ClientDetailsService clientDetailsService;
+	     
+	    @Autowired
+	    public void globalUserDetails(AuthenticationManagerBuilder auth) throws Exception {
+	        auth.inMemoryAuthentication()
+	        .withUser("bbastia").password("password").roles("ADMIN").and()
+	        .withUser("vikram").password("bharti").roles("USER");
+	    }
+	 
+	    @Override
+	    protected void configure(HttpSecurity http) throws Exception {
+	        http
+	        .csrf().disable()
+	        .anonymous().disable()
+	        .authorizeRequests()
+	        .antMatchers("/oauth/token").permitAll();
+	    }
+	 
+	    @Override
+	    @Bean
+	    public AuthenticationManager authenticationManagerBean() throws Exception {
+	        return super.authenticationManagerBean();
+	    }
+	 
+	 
+	    @Bean
+	    public TokenStore tokenStore() {
+	        return new InMemoryTokenStore();
+	    }
+	 
+	    @Bean
+	    @Autowired
+	    public TokenStoreUserApprovalHandler userApprovalHandler(TokenStore tokenStore){
+	        TokenStoreUserApprovalHandler handler = new TokenStoreUserApprovalHandler();
+	        handler.setTokenStore(tokenStore);
+	        handler.setRequestFactory(new DefaultOAuth2RequestFactory(clientDetailsService));
+	        handler.setClientDetailsService(clientDetailsService);
+	        return handler;
+	    }
+	     
+	    @Bean
+	    @Autowired
+	    public ApprovalStore approvalStore(TokenStore tokenStore) throws Exception {
+	        TokenApprovalStore store = new TokenApprovalStore();
+	        store.setTokenStore(tokenStore);
+	        return store;
+	    }
+	     
 }
